@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "build": "npm run build:ps && npm run build:fe",
+    "build:ps": "spago2nix install -j 100; spago2nix build",
+    "build:fe": "node_modules/.bin/parcel build index.html"
+  },
+  "dependencies": {
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "parcel-bundler": "^1.12.4"
+  }
+}

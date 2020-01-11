@@ -1,0 +1,12 @@
+/target
+**/*.rs.bk
+/node_modules/
+/output/
+/.spago*
+/build/
+/dist/icons
+/dist/index.html
+/dist/index.js
+/dist/parcel*
+/dist/index.map
+/.cache
