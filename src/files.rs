@@ -56,13 +56,9 @@ pub fn open_file(dir: &String, path: &String, exe: &String) -> MyResult<()> {
     let path = std::path::Path::new(&dir).join(path);
     let status = std::process::Command::new(exe)
         .arg(&path)
-        .status()
+        .spawn()
         .or(error(format!("Error opening exe: {}", exe)))?;
-    if status.success() {
-        Ok(())
-    } else {
-        error(format!("Could not open with {}: {:?}", exe, path))
-    }
+    Ok(())
 }
 
 pub async fn get_icons(dir: &String) -> MyResult<()> {
