@@ -1,6 +1,6 @@
 # vt
 
-wip
+This is [vidtracker](https://github.com/justinwoo/vidtracker) but with a Rust backend. PureScript frontend.
 
 ## Config
 
