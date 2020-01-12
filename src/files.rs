@@ -54,7 +54,7 @@ pub fn get_titles(dir: &String) -> MyResult<Vec<String>> {
 
 pub fn open_file(dir: &String, path: &String, exe: &String) -> MyResult<()> {
     let path = std::path::Path::new(&dir).join(path);
-    let status = std::process::Command::new(exe)
+    std::process::Command::new(exe)
         .arg(&path)
         .spawn()
         .or(error(format!("Error opening exe: {}", exe)))?;

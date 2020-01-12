@@ -2,15 +2,15 @@ use actix_web::{web, App, HttpRequest, HttpServer};
 use std::io;
 use std::sync::Mutex;
 
-use vt::types::{to_actix_result, ActixResult, Update, Open};
+use vt::types::{to_actix_result, ActixResult, Open, Update};
 
 struct MyData {
     dir: String,
     exe: String,
-    conn: rusqlite::Connection,
+    conn: Mutex<rusqlite::Connection>,
 }
 
-type MyState = web::Data<Mutex<MyData>>;
+type MyState = web::Data<MyData>;
 
 fn print_req(req: &HttpRequest) {
     println!(
@@ -21,44 +21,45 @@ fn print_req(req: &HttpRequest) {
     );
 }
 
+macro_rules! get_conn {
+    ($state: ident) => {
+        &$state
+            .conn
+            .lock()
+            .expect("Could not get lock on database connection.");
+    };
+}
+
 async fn update(state: MyState, update: web::Json<Update>, req: HttpRequest) -> ActixResult {
     print_req(&req);
-    let data = state.lock().unwrap();
-    let conn = &data.conn;
+    let conn = get_conn!(state);
     let result = vt::db::upsert_watched_path(conn, &update.path, update.watched);
     to_actix_result(result.map(|_| "OK"))
 }
 
 async fn watched(state: MyState, req: HttpRequest) -> ActixResult {
     print_req(&req);
-    let data = state.lock().unwrap();
-    let watched = vt::db::get_watched(&data.conn);
+    let conn = get_conn!(state);
+    let watched = vt::db::get_watched(conn);
     to_actix_result(watched)
 }
 
 async fn files(state: MyState, req: HttpRequest) -> ActixResult {
     print_req(&req);
-    let data = state.lock().unwrap();
-    let dir = &data.dir;
-    let paths = vt::files::get_paths(dir);
+    let paths = vt::files::get_paths(&state.dir);
     to_actix_result(paths)
 }
 
 async fn open(state: MyState, open: web::Json<Open>, req: HttpRequest) -> ActixResult {
     print_req(&req);
-    let data = state.lock().unwrap();
-    let dir = &data.dir;
-    let exe = &data.exe;
     let path = &open.path;
-    let result = vt::files::open_file(dir, &path, exe);
+    let result = vt::files::open_file(&state.dir, &path, &state.exe);
     to_actix_result(result.map(|_| "OK"))
 }
 
 async fn get_icons(state: MyState, req: HttpRequest) -> ActixResult {
     print_req(&req);
-    let data = state.lock().unwrap();
-    let dir = &data.dir;
-    let result = vt::files::get_icons(dir).await;
+    let result = vt::files::get_icons(&state.dir).await;
     to_actix_result(result.map(|_| "OK"))
 }
 
@@ -70,7 +71,11 @@ async fn main() -> io::Result<()> {
     let conn = vt::db::get_conn(&dir).expect("Could not get a connection to the database.");
     vt::db::ensure_table(&conn).unwrap();
 
-    let my_data = web::Data::new(Mutex::new(MyData { dir, exe, conn }));
+    let my_data = web::Data::new(MyData {
+        dir,
+        exe,
+        conn: Mutex::new(conn),
+    });
 
     HttpServer::new(move || {
         App::new()
