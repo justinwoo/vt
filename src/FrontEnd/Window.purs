@@ -2,9 +2,11 @@ module FrontEnd.Window where
 
 import Prelude
 
+import Data.Time.Duration (Milliseconds(..))
 import Effect (Effect)
 import FRP.Event (Event)
 import FRP.Event as Event
+import FRP.Event.Time as ET
 import FrontEnd.Types (Direction(..), KeyboardEvent(..), ScrollEvent(..))
 import Types (Path)
 
@@ -33,4 +35,4 @@ window scrollEvent = do
     ScrollFileIntoView file ->
       scrollIntoView file.name
 
-  pure event
+  pure $ ET.debounce (Milliseconds 40.0) event
