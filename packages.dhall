@@ -1,5 +1,5 @@
 let upstream =
-      https://github.com/purescript/package-sets/releases/download/psc-0.13.2-20190803/packages.dhall sha256:cf1acc1224e5b9fdd114fb085ee3ccc594622c2cdd25176c25dd9fdeff4f551c
+      https://github.com/purescript/package-sets/releases/download/psc-0.13.5-20200103/packages.dhall sha256:0a6051982fb4eedb72fbe5ca4282259719b7b9b525a4dda60367f98079132f30
 
 in    upstream
     ⫽ { calpis =

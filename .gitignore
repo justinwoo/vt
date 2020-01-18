@@ -2,7 +2,7 @@
 **/*.rs.bk
 /node_modules/
 /output/
-/.spago*
+/.psc-package*
 /build/
 /dist/icons
 /dist/index.html
