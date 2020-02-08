@@ -2,11 +2,14 @@ module FrontEnd.Window where
 
 import Prelude
 
-import Data.Time.Duration (Milliseconds(..))
+import Data.Foldable (traverse_)
+import Data.JSDate (getTime, now)
+import Data.Maybe (Maybe(..))
+import Data.Monoid (guard)
 import Effect (Effect)
+import Effect.Ref as Ref
 import FRP.Event (Event)
 import FRP.Event as Event
-import FRP.Event.Time as ET
 import FrontEnd.Types (Direction(..), KeyboardEvent(..), ScrollEvent(..))
 import Types (Path)
 
@@ -18,21 +21,35 @@ foreign import scrollToTop :: Effect Unit
 window :: Event ScrollEvent -> Effect (Event KeyboardEvent)
 window scrollEvent = do
   {event, push} <- Event.create
-  addWindowKeyListener \key ->
-    case key of
-      "o" -> push OpenEvent
-      "k" -> push $ DirectionEvent Up
-      "j" -> push $ DirectionEvent Down
-      "f" -> push ToggleFilterWatched
-      "W" -> push MarkEvent
-      "M" -> push MarkEvent
-      "r" -> push RefreshEvent
-      "I" -> push FetchIconsEvent
-      "g" -> push ToggleGroupedEvent
-      _ -> pure unit
+
+  prevTimeRef <- Ref.new 0.0
+
+  addWindowKeyListener \key -> do
+    let
+      mAction =
+        case key of
+          "o" -> Just OpenEvent
+          "k" -> Just $ DirectionEvent Up
+          "j" -> Just $ DirectionEvent Down
+          "f" -> Just ToggleFilterWatched
+          "W" -> Just MarkEvent
+          "M" -> Just MarkEvent
+          "r" -> Just RefreshEvent
+          "I" -> Just FetchIconsEvent
+          "g" -> Just ToggleGroupedEvent
+          _ -> Nothing
+
+    prevTime <- Ref.read prevTimeRef
+    currTime <- getTime <$> now
+
+    let timediff = currTime - prevTime
+
+    guard (timediff > 40.0) do
+      traverse_ push mAction
+      Ref.modify_ (\_ -> currTime) prevTimeRef
 
   void $ Event.subscribe scrollEvent case _ of
     ScrollFileIntoView file ->
       scrollIntoView file.name
 
-  pure $ ET.debounce (Milliseconds 40.0) event
+  pure event

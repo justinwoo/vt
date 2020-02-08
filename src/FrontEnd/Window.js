@@ -1,6 +1,6 @@
 exports.addWindowKeyListener = function(effect) {
   return function() {
-    window.addEventListener("keypress", function(e) {
+    window.addEventListener("keydown", function(e) {
       effect(e.key)();
     });
   };

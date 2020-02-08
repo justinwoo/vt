@@ -5,8 +5,8 @@ let
     pkgs.fetchFromGitHub {
       owner = "justinwoo";
       repo = "easy-purescript-nix";
-      rev = "485471b86f764b9dd34e77ae767a629290f7f295";
-      sha256 = "0fh7sxpnp8krs091imksrs6w3vw31sq9kpz26mdw1kbpa8f0sgby";
+      rev = "d5f44b9389b290874cc3e479741b746067f19a78";
+      sha256 = "0vswaasg2ik7csi40a0ihpxxzp4c803z7mjd096f3lmjrbw4j4av";
     }
   ) {
     inherit pkgs;
@@ -16,8 +16,8 @@ let
     pkgs.fetchFromGitHub {
       owner = "justinwoo";
       repo = "soba";
-      rev = "e81a2a768bb22f6e7678f7296f96cbf1b45276ae";
-      sha256 = "1xd80sm10d9k7v3807pz8kh1b09ahjmdxlgiiyrplnm08kjrphb6";
+      rev = "0f4f5162be2274cb9b1bfdc12f724aea84736ff3";
+      sha256 = "1wyl9d6c8igxfm33kfg6b12yifgl0pac91xymnldzh1sj2l46khm";
     }
   ) {
     inherit pkgs;
@@ -68,8 +68,6 @@ in
 pkgs.mkShell {
   buildInputs = [
     easy-ps.purs
-    easy-ps.spago
-    easy-ps.spago2nix
     soba
     install-purs-packages
     build-purs

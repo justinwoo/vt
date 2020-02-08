@@ -1,7 +1,7 @@
 {
   "name": "name",
   "set": "local",
-  "source": ".psc-package",
+  "source": "psc-package.json",
   "depends": [
     "aff",
     "bonjiri",
