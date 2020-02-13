@@ -1,4 +1,8 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> {}
+, user ? "justin"
+, dir ? "/home/${user}/Code/vt"
+}:
+
 
 let
   easy-ps = import (
@@ -64,6 +68,37 @@ let
     >>$target echo 'purs compile ${builtins.toString (builtins.map storePath (builtins.attrValues purs-packages))} "src/**/*.purs"'
   '';
 
+  home = "/home/${user}";
+  nix-init = ''. ${home}/.bashrc'';
+  cmd = ''cd ${dir} && target/debug/vt'';
+
+  sdunit = pkgs.writeTextFile {
+    name = "vt";
+    destination = "/vt.service";
+    text = ''
+      [Unit]
+      Description=vt - vid tracker
+
+      [Service]
+      Type=simple
+      ExecStart=/bin/bash -c "${nix-init} && ${cmd}"
+
+      [Install]
+      WantedBy=default.target
+    '';
+  };
+
+  install-systemd-unit = pkgs.writeShellScriptBin "install-systemd-unit" ''
+    #!/usr/bin/env nix-shell
+    #!nix-shell -i bash
+
+    service="vt.service"
+    systemctl --user disable --now $service | echo "$service is already disabled"
+    systemctl --user enable --now "${sdunit}/$service"
+    systemctl --user daemon-reload
+    systemctl --user reset-failed
+  '';
+
 in
 pkgs.mkShell {
   buildInputs = [
@@ -72,5 +107,6 @@ pkgs.mkShell {
     install-purs-packages
     build-purs
     build-purs-from-store
+    install-systemd-unit
   ];
 }
