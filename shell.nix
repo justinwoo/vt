@@ -38,34 +38,23 @@ let
         cp --no-preserve=mode,ownership,timestamp -r ${pp.fetched.outPath}/* ${target}
       '';
 
-  install-purs-packages = pkgs.runCommand "install-purs-packages" {} ''
-    mkdir -p $out/bin
-    target=$out/bin/install-purs-packages
-    touch $target
-    chmod +x $target
-    >>$target echo '#!/usr/bin/env bash'
-    >>$target echo '${builtins.toString (builtins.map cpPackage (builtins.attrValues purs-packages))}'
-    >>$target echo 'echo done installing deps.'
+  install-purs-packages = pkgs.writeShellScriptBin "install-purs-packages" ''
+    #!/usr/bin/env bash
+    ${builtins.toString (builtins.map cpPackage (builtins.attrValues purs-packages))}
+    echo done installing deps.
   '';
 
-  build-purs = pkgs.runCommand "build-purs" {} ''
-    mkdir -p $out/bin
-    target=$out/bin/build-purs
-    touch $target
-    chmod +x $target
-    >>$target echo '#!/usr/bin/env bash'
-    >>$target echo 'purs compile ".psc-package/*/*/*/src/**/*.purs" "src/**/*.purs"'
+  build-purs = pkgs.writeShellScriptBin "build-purs" ''
+    #!/usr/bin/env bash
+    purs compile "src/**/*.purs" ".psc-package/*/*/*/src/**/*.purs"
   '';
 
   storePath = x: ''"${x.fetched.outPath}/src/**/*.purs"'';
 
-  build-purs-from-store = pkgs.runCommand "build-purs-from-store" {} ''
-    mkdir -p $out/bin
-    target=$out/bin/build-purs-from-store
-    touch $target
-    chmod +x $target
-    >>$target echo '#!/usr/bin/env bash'
-    >>$target echo 'purs compile ${builtins.toString (builtins.map storePath (builtins.attrValues purs-packages))} "src/**/*.purs"'
+  build-purs-from-store = pkgs.writeShellScriptBin "build-purs-from-store" ''
+    #!/usr/bin/env bash
+    purs compile "src/**/*.purs" \
+      ${builtins.toString (builtins.map storePath (builtins.attrValues purs-packages))}
   '';
 
   home = "/home/${user}";
