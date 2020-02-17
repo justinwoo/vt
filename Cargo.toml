@@ -1,18 +1,5 @@
-[package]
-name = "vt"
-version = "0.1.0"
-authors = ["justinwoo <moomoowoo@gmail.com>"]
-edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-actix-rt = "*"
-actix-web = "2.0.0"
-actix-files = "*"
-regex = "1.3.3"
-rusqlite = "0.21.0"
-serde = { version = "1.0.104", features = ["derive"] }
-serde_derive = "*"
-serde_json = "*"
-tokio = { version = "0.2.9", features = ["process"] }
+[workspace]
+members = [
+    "lib",
+    "backend"
+]

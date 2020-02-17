@@ -1,4 +1,4 @@
-use crate::types::*;
+use vt::types::*;
 use regex::Regex;
 use std::collections::HashSet;
 use std::fs::{read_dir, DirEntry};

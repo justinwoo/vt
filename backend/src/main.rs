@@ -2,7 +2,8 @@ use actix_web::{web, App, HttpRequest, HttpServer};
 use std::io;
 use std::sync::Mutex;
 
-use vt::types::{to_actix_result, ActixResult, Open, Update};
+use vt::types::{Open, Update};
+use backend::actix::{to_actix_result, ActixResult};
 
 struct MyData {
     dir: String,
@@ -33,33 +34,33 @@ macro_rules! get_conn {
 async fn update(state: MyState, update: web::Json<Update>, req: HttpRequest) -> ActixResult {
     print_req(&req);
     let conn = get_conn!(state);
-    let result = vt::db::upsert_watched_path(conn, &update.path, update.watched);
+    let result = backend::db::upsert_watched_path(conn, &update.path, update.watched);
     to_actix_result(result.map(|_| "OK"))
 }
 
 async fn watched(state: MyState, req: HttpRequest) -> ActixResult {
     print_req(&req);
     let conn = get_conn!(state);
-    let watched = vt::db::get_watched(conn);
+    let watched = backend::db::get_watched(conn);
     to_actix_result(watched)
 }
 
 async fn files(state: MyState, req: HttpRequest) -> ActixResult {
     print_req(&req);
-    let paths = vt::files::get_paths(&state.dir);
+    let paths = backend::files::get_paths(&state.dir);
     to_actix_result(paths)
 }
 
 async fn open(state: MyState, open: web::Json<Open>, req: HttpRequest) -> ActixResult {
     print_req(&req);
     let path = &open.path;
-    let result = vt::files::open_file(&state.dir, &path, &state.exe);
+    let result = backend::files::open_file(&state.dir, &path, &state.exe);
     to_actix_result(result.map(|_| "OK"))
 }
 
 async fn get_icons(state: MyState, req: HttpRequest) -> ActixResult {
     print_req(&req);
-    let result = vt::files::get_icons(&state.dir).await;
+    let result = backend::files::get_icons(&state.dir).await;
     to_actix_result(result.map(|_| "OK"))
 }
 
@@ -68,8 +69,8 @@ async fn main() -> io::Result<()> {
     let dir = std::env::var("DIR").expect("DIR must be set to the videos home.");
     let exe = std::env::var("EXE").expect("EXE must be set to an executable in PATH.");
 
-    let conn = vt::db::get_conn(&dir).expect("Could not get a connection to the database.");
-    vt::db::ensure_table(&conn).unwrap();
+    let conn = backend::db::get_conn(&dir).expect("Could not get a connection to the database.");
+    backend::db::ensure_table(&conn).unwrap();
 
     let my_data = web::Data::new(MyData {
         dir,

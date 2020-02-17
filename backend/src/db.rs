@@ -1,6 +1,6 @@
 use rusqlite::{params, Connection};
 
-use crate::types::*;
+use vt::types::*;
 
 pub fn get_conn(dir: &String) -> MyResult<Connection> {
     let path = std::path::Path::new(&dir).join("filetracker");

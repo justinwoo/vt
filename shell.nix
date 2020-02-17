@@ -59,7 +59,7 @@ let
 
   home = "/home/${user}";
   nix-init = ''. ${home}/.bashrc'';
-  cmd = ''cd ${dir} && target/debug/vt'';
+  cmd = ''cd ${dir} && target/debug/backend'';
 
   sdunit = pkgs.writeTextFile {
     name = "vt";
