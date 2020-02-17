@@ -97,5 +97,6 @@ pkgs.mkShell {
     build-purs
     build-purs-from-store
     install-systemd-unit
+    pkgs.wasm-pack
   ];
 }

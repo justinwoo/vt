@@ -2,12 +2,18 @@
   "scripts": {
     "build": "yarn run build:ps && yarn run build:fe",
     "build:ps": "install-purs-packages && build-purs",
-    "build:fe": "node_modules/.bin/parcel build index.html"
+    "build:fe": "webpack",
+    "build:wasm": "wasm-pack build wasm/"
   },
   "dependencies": {
+    "@wasm-tool/wasm-pack-plugin": "^1.1.0",
+    "html-webpack-plugin": "^3.2.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "parcel-bundler": "^1.12.4"
+    "text-encoding": "^0.7.0",
+    "webpack": "^4.41.6",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.10.3"
   },
   "license": "MIT"
 }
