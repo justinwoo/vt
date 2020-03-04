@@ -11,3 +11,4 @@
 /dist/index.map
 /.cache
 pkg
+*.jpg
