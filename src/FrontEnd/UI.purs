@@ -54,8 +54,8 @@ ui = RB.makeStateless _ui \props ->
       , "I: fetch icons and reload page"
       , "files loading: " <> if state.filesLoading then "true" else "false"
       , "icons loading: " <> if state.iconsLoading then "true" else "false"
-      , "grouped by series: " <> if state.grouped then "true" else "false"
-      , "filtering watched: " <> if state.filterWatched then "true" else "false"
+      , "g, grouped by series: " <> if state.grouped then "true" else "false"
+      , "F, filtering watched: " <> if state.filterWatched then "true" else "false"
       ]
 
     recents = mkRecent <$> Array.take (Array.length infoLines) state.watchedData

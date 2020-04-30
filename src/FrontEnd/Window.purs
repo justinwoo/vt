@@ -31,7 +31,7 @@ window scrollEvent = do
           "o" -> Just OpenEvent
           "k" -> Just $ DirectionEvent Up
           "j" -> Just $ DirectionEvent Down
-          "f" -> Just ToggleFilterWatched
+          "F" -> Just ToggleFilterWatched
           "W" -> Just MarkEvent
           "M" -> Just MarkEvent
           "r" -> Just RefreshEvent
