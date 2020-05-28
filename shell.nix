@@ -9,8 +9,8 @@ let
     pkgs.fetchFromGitHub {
       owner = "justinwoo";
       repo = "easy-purescript-nix";
-      rev = "14e7d85431e9f9838d7107d18cb79c7fa534f54e";
-      sha256 = "0lmkppidmhnayv0919990ifdd61f9d23dzjzr8amz7hjgc74yxs0";
+      rev = "0ba91d9aa9f7421f6bfe4895677159a8a999bf20";
+      sha256 = "1baq7mmd3vjas87f0gzlq83n2l1h3dlqajjqr7fgaazpa9xgzs7q";
     }
   ) {
     inherit pkgs;
@@ -20,8 +20,8 @@ let
     pkgs.fetchFromGitHub {
       owner = "justinwoo";
       repo = "soba";
-      rev = "2add8804bce7e7c1ab5eb1c3d8f6783e938a04d3";
-      sha256 = "1qagyklcllr2sxdb315prw33af6g37762zgk2ahh3ifxpns6ifxx";
+      rev = "d23c4d54cc9ec60e98cba494c530f246acaa1b61";
+      sha256 = "0azg091i38lq77iplxlp5z568s32qvy08gnhybf4rgqjgip2zpzs";
     }
   ) {
     inherit pkgs;
@@ -29,9 +29,11 @@ let
 
   purs-packages = import ./purs-packages.nix { inherit pkgs; };
 
+  purs-package-path = pp: ".psc-package/local/${pp.name}/${pp.version}";
+
   cpPackage = pp:
     let
-      target = ".psc-package/local/${pp.name}/${pp.version}";
+      target = purs-package-path pp;
     in
       ''
         mkdir -p ${target}
@@ -44,9 +46,13 @@ let
     echo done installing deps.
   '';
 
+  purs-package-glob-quoted = pp: ''"${purs-package-path pp}/src/**/*.purs"'';
+
+  purs-packages-globs = builtins.map purs-package-glob-quoted (builtins.attrValues purs-packages);
+
   build-purs = pkgs.writeShellScriptBin "build-purs" ''
     #!/usr/bin/env bash
-    purs compile "src/**/*.purs" ".psc-package/*/*/*/src/**/*.purs"
+    purs compile "src/**/*.purs" ${toString (purs-packages-globs)}
   '';
 
   storePath = x: ''"${x.fetched.outPath}/src/**/*.purs"'';
