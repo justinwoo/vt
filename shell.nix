@@ -3,27 +3,8 @@
 , dir ? "/home/${user}/Code/vt"
 }:
 let
-  easy-ps = import (
-    pkgs.fetchFromGitHub {
-      owner = "justinwoo";
-      repo = "easy-purescript-nix";
-      rev = "0ba91d9aa9f7421f6bfe4895677159a8a999bf20";
-      sha256 = "1baq7mmd3vjas87f0gzlq83n2l1h3dlqajjqr7fgaazpa9xgzs7q";
-    }
-  ) {
-    inherit pkgs;
-  };
-
-  purs-packages = import ./purs-packages.nix { inherit pkgs; };
-  getQuotedSourceGlob = x: ''"${x.src}/src/**/*.purs"'';
-  sourceGlobs = map getQuotedSourceGlob (builtins.attrValues purs-packages);
-  vt-purs-output = pkgs.runCommand "vt-purs-output" {
-    buildInputs = [ easy-ps.purs-0_13_8 ];
-  } ''
-    mkdir $out
-    cd $out
-    purs compile ${toString sourceGlobs} "${./src}/**/*.purs"
-  '';
+  easy-ps = import ./nix/easy-ps.nix { inherit pkgs; };
+  build-purs = import ./nix/build-purs.nix { inherit pkgs; };
 
   home = "/home/${user}";
   nix-init = ''. ${home}/.bashrc'';
@@ -64,6 +45,7 @@ pkgs.mkShell {
   ];
 
   shellHook = ''
-    alias copy-purs-output="rm -rf output; cp -R --no-preserve=mode ${vt-purs-output}/output output"
+    export PURS_IDE_SOURCES='${toString build-purs.sourceGlobs}'
+    alias copy-purs-output="rm -rf output; cp -R --no-preserve=mode ${build-purs.vt-purs-output}/output output"
   '';
 }

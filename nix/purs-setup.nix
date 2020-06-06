@@ -2,17 +2,14 @@
 #!nix-shell ./purs-setup.nix --run exit
 { pkgs ? import <nixpkgs> {} }:
 let
-  packages-json = import ./packages-json.nix { inherit pkgs; };
-  generate-purs-packages = import ./generate-purs-packages.nix { inherit pkgs; };
+  package-set-archive = import ./package-set-archive.nix { inherit pkgs; };
 in
 pkgs.mkShell {
-  buildInputs = [
-    generate-purs-packages
-  ];
   shellHook = ''
     echo "Copying packages.json..."
-    cp --no-preserve=mode ${packages-json} packages.json
-    echo "Generating purs-packages.nix..."
-    generate-purs-packages > purs-packages.nix
+    cp --no-preserve=mode ${package-set-archive}/packages.json packages.json
+    echo "Setting up psc-package dependencies..."
+    mkdir -p .psc-package/local
+    cp --no-preserve=mode -R ${package-set-archive}/pkgs/* .psc-package/local
   '';
 }
