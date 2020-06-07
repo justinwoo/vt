@@ -13,11 +13,13 @@ let
   };
   solved = import "${psc-package-nix}/nix/solve-set.nix" { inherit pkgs packagesJson inputNames; };
 
-  getQuotedSourceGlob = key:
+  getUnquotedSourceGlob = key:
     let
       x = builtins.getAttr key solved.pkgSpecs;
-    in ''"${package-set-archive}/pkgs/${key}/${x.version}/src/**/*.purs"'';
-  sourceGlobs = map getQuotedSourceGlob solved.pkgNames;
+    in ''${package-set-archive}/pkgs/${key}/${x.version}/src/**/*.purs'';
+  unquotedSourceGlobs = map getUnquotedSourceGlob solved.pkgNames;
+  quote = x: ''"${x}"'';
+  sourceGlobs = map quote unquotedSourceGlobs;
 
   vt-purs-output = pkgs.runCommand "vt-purs-output" {
     buildInputs = [ easy-ps.purs-0_13_8 ];
@@ -27,4 +29,4 @@ let
     purs compile ${toString sourceGlobs} "${../src}/**/*.purs"
   '';
 in
-{ inherit solved sourceGlobs vt-purs-output; }
+{ inherit solved sourceGlobs unquotedSourceGlobs vt-purs-output; }

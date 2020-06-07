@@ -45,7 +45,7 @@ pkgs.mkShell {
   ];
 
   shellHook = ''
-    export PURS_IDE_SOURCES='${toString build-purs.sourceGlobs}'
+    export PURS_IDE_SOURCES='${toString build-purs.unquotedSourceGlobs}'
     alias copy-purs-output="rm -rf output; cp -R --no-preserve=mode ${build-purs.vt-purs-output}/output output"
   '';
 }
