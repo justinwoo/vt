@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> {}
+{ pkgs ? import <nixpkgs> { }
 , user ? "justin"
 , dir ? "/home/${user}/Code/vt"
 }:
@@ -36,16 +36,31 @@ let
     systemctl --user daemon-reload
     systemctl --user reset-failed
   '';
+
+  copy-purs-output = pkgs.writeShellScriptBin "copy-vt-purs-output" ''
+    set -e
+    nix-build nix/build-purs.nix -A vt-purs-output -o vt-purs-result
+    rm -rf output
+    mkdir output
+    cp -R --no-preserve=mode vt-purs-result/* output
+    rm vt-purs-result
+  '';
+
+  build-purs-script = pkgs.writeShellScriptBin "build-purs" ''
+    purs compile ${toString build-purs.sourceGlobs} "src/**/*.purs"
+  '';
+
 in
 pkgs.mkShell {
   buildInputs = [
     easy-ps.purs-0_13_8
     easy-ps.psc-package
     install-systemd-unit
+    copy-purs-output
+    build-purs-script
   ];
 
   shellHook = ''
     export PURS_IDE_SOURCES='${toString build-purs.unquotedSourceGlobs}'
-    alias copy-purs-output="rm -rf output; cp -R --no-preserve=mode ${build-purs.vt-purs-output}/output output"
   '';
 }

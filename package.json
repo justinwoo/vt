@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "yarn run build:ps && yarn run build:fe",
-    "build:ps": "install-purs-packages && build-purs",
+    "build:ps": "build-purs",
     "build:fe": "node_modules/.bin/parcel build index.html"
   },
   "dependencies": {

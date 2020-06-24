@@ -1,7 +1,7 @@
 /target
 **/*.rs.bk
 /node_modules/
-/output/
+/output
 /.psc-package*
 /build/
 /dist/icons

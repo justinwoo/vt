@@ -1,10 +1,24 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> { } }:
 let
   easy-ps = import ./easy-ps.nix { inherit pkgs; };
-
   package-set-archive = import ./package-set-archive.nix { inherit pkgs; };
-  inputNames = (builtins.fromJSON (builtins.readFile ../psc-package.json)).depends;
-  packagesJson = ../packages.json;
+  inputNames = [
+    "aff"
+    "bonjiri"
+    "calpis"
+    "choco-pie"
+    "console"
+    "debug"
+    "effect"
+    "makkori"
+    "naporitan"
+    "react-basic"
+    "simple-json"
+    "simple-json-utils"
+    "string-parsers"
+    "test-unit"
+  ];
+  packagesJson = "${package-set-archive}/packages.json";
   psc-package-nix = pkgs.fetchFromGitHub {
     owner = "justinwoo";
     repo = "psc-package-nix";
@@ -16,17 +30,18 @@ let
   getUnquotedSourceGlob = key:
     let
       x = builtins.getAttr key solved.pkgSpecs;
-    in ''${package-set-archive}/pkgs/${key}/${x.version}/src/**/*.purs'';
+    in
+    ''${package-set-archive}/pkgs/${key}/${x.version}/src/**/*.purs'';
   unquotedSourceGlobs = map getUnquotedSourceGlob solved.pkgNames;
   quote = x: ''"${x}"'';
   sourceGlobs = map quote unquotedSourceGlobs;
 
-  vt-purs-output = pkgs.runCommand "vt-purs-output" {
-    buildInputs = [ easy-ps.purs-0_13_8 ];
-  } ''
+  vt-purs-output = pkgs.runCommand "vt-purs-output"
+    {
+      buildInputs = [ easy-ps.purs-0_13_8 ];
+    } ''
     mkdir $out
-    cd $out
-    purs compile ${toString sourceGlobs} "${../src}/**/*.purs"
+    purs compile ${toString sourceGlobs} "${../src}/**/*.purs" -o $out
   '';
 in
 { inherit solved sourceGlobs unquotedSourceGlobs vt-purs-output; }
