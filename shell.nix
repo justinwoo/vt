@@ -67,6 +67,7 @@ pkgs.mkShell {
     install-systemd-unit
     copy-purs-output
     build-purs-script
+    pkgs.sqlite
   ];
 
   shellHook = ''
