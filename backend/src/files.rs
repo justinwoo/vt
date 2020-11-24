@@ -1,7 +1,7 @@
-use vt::types::*;
 use regex::Regex;
 use std::collections::HashSet;
 use std::fs::{read_dir, DirEntry};
+use vt::types::*;
 
 pub fn get_paths(dir: &String) -> MyResult<Vec<Path>> {
     let path = std::path::Path::new(&dir);
@@ -38,7 +38,7 @@ pub fn get_paths(dir: &String) -> MyResult<Vec<Path>> {
 }
 
 pub fn get_titles(dir: &String) -> MyResult<Vec<String>> {
-    let regex = Regex::new(r"\[.*\] (.*) - \d+ \[\d+p]\.mkv").unwrap();
+    let regex = Regex::new(r"\[.*\] (.*) - \d+ [\[\(].+[\)\]]+.*\.mkv").unwrap();
     let paths = get_paths(dir)?;
 
     let mut set: HashSet<String> = HashSet::new();
