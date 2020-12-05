@@ -5,10 +5,8 @@ import Prelude
 import ChocoPie (runChocoPie)
 import Control.Alt ((<|>))
 import Data.Array as Array
-import Data.Either (hush)
 import Data.Foldable (maximumBy)
 import Data.Function (on)
-import Data.Int as Int
 import Data.Maybe (Maybe(..), isJust, isNothing, maybe)
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
@@ -20,8 +18,7 @@ import FrontEnd.HTTP (http)
 import FrontEnd.Types (Action(..), AppState, DateString(..), Direction(..), File, KeyboardEvent(..), Request(..), ScrollEvent(..))
 import FrontEnd.UI (view)
 import FrontEnd.Window (window)
-import NameParser (nameParser)
-import Text.Parsing.StringParser (runParser)
+import NameParser (parseTitle)
 import Types (Path(..), WatchedData)
 
 initialState :: AppState
@@ -140,11 +137,11 @@ getFiles paths watchedData = do
       { name: Path name
       , watched: DateString <<< _.created <$> Array.find (\x -> x.path == file) watched
       , series: _.name <$> parsed
-      , episode: Int.fromString <<< _.episode =<< parsed
+      , episode: _.episode <$> parsed
       , latest: Nothing
       } :: File
       where
-        parsed = hush $ runParser nameParser name
+        parsed = parseTitle name
 
     annotateLatest :: Array File -> Array File
     annotateLatest xs = updateLatest <$> xs
