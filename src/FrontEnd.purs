@@ -3,6 +3,7 @@ module FrontEnd where
 import Prelude
 
 import ChocoPie (runChocoPie)
+import Console as Console
 import Control.Alt ((<|>))
 import Data.Array as Array
 import Data.Foldable (maximumBy)
@@ -11,7 +12,6 @@ import Data.Maybe (Maybe(..), isJust, isNothing, maybe)
 import Data.Tuple (Tuple(..))
 import Effect (Effect)
 import Effect.Class (liftEffect)
-import Effect.Class.Console as Console
 import FRP.Event (Event)
 import FRP.Event as Event
 import FrontEnd.HTTP (http)

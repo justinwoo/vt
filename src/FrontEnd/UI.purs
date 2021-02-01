@@ -13,10 +13,7 @@ import FRP.Event as Event
 import FrontEnd.HTTP (prefixUrl)
 import FrontEnd.Types (Action(..), AppState, DateString(..), File)
 import Global.Unsafe (unsafeEncodeURIComponent)
-import React.Basic as RB
-import React.Basic.DOM as R
-import React.Basic.DOM.Events (capture_) as Events
-import React.Basic.Events (handler_) as Events
+import React as R
 import Types (Path(..))
 
 type Props =
@@ -24,25 +21,19 @@ type Props =
   , push :: Action -> Effect Unit
   }
 
-div' :: String -> Array RB.JSX -> RB.JSX
-div' className children = R.div { className, children }
-
 mkIconURL :: String -> String
 mkIconURL series = "url(\"" <> un C.URL (prefixUrl $ iconsPath) <> "\")"
   where iconsPath = "/icons/" <> unsafeEncodeURIComponent series
 
-_ui :: RB.Component Props
-_ui = RB.createComponent "UI"
-
-ui :: Props -> RB.JSX
-ui = RB.makeStateless _ui \props ->
+ui :: Props -> R.JSX
+ui = R.component "UI" \props -> do
   let
     { appState: state } = props
     files = state.files
 
-    header = div' "header"
-      [ div' "info" $ [ R.h3_ [ R.text "Info:" ] ] <> infoLines
-      , div' "recents" $ [ R.h3_ [ R.text "Recently watched:" ] ] <> recents
+    header = R.div' "header"
+      [ R.div' "info" $ [ R.h3_ [ R.text "Info:" ] ] <> infoLines
+      , R.div' "recents" $ [ R.h3_ [ R.text "Recently watched:" ] ] <> recents
       ]
 
     infoLines = R.span_ <<< pure <<< R.text <$>
@@ -60,12 +51,12 @@ ui = RB.makeStateless _ui \props ->
 
     recents = mkRecent <$> Array.take (Array.length infoLines) state.watchedData
 
-    mkRecent { path: Path name } = div' "recent" [ R.text name ]
+    mkRecent { path: Path name } = R.div' "recent" [ R.text name ]
 
-    mkFile :: Int -> File -> RB.JSX
-    mkFile idx file = RB.keyed (un Path file.name) $ fileElement { idx, file, props }
+    mkFile :: Int -> File -> R.JSX
+    mkFile idx file = fileElement { key: un Path file.name, idx, file, props }
 
-  in
+  pure $
     R.div_
       [ R.h1_ [R.text "vidtracker"]
       , header
@@ -73,21 +64,19 @@ ui = RB.makeStateless _ui \props ->
       ]
 
 type FileProps =
-  { idx :: Int
+  { key :: String
+  , idx :: Int
   , file :: File
   , props :: Props
   }
 
-fileElement_ :: RB.Component FileProps
-fileElement_ = RB.createComponent "FileElement"
-
-fileElement :: FileProps -> RB.JSX
-fileElement = RB.makeStateless fileElement_ \{ idx, file, props } ->
-  let
-    { appState: state, push } = props
-  in
+fileElement :: FileProps -> R.JSX
+fileElement = R.component "FileElement" \{ key, idx, file, props } -> do
+  let { appState: state, push } = props
+  pure $
     R.div
-      { className: intercalate " "
+      { key
+      , className: intercalate " "
           [ "file"
           , case state.cursor of
               Just pos | pos == idx -> "cursor"
@@ -97,43 +86,39 @@ fileElement = RB.makeStateless fileElement_ \{ idx, file, props } ->
               Nothing -> ""
           ]
       , title : "latest watched: " <> fromMaybe "unknown" (show <$> file.latest)
-      , onClick: Events.handler_ $ push (SetCursor idx)
-      , children:
-          [ R.div
-              { className: "icon"
-              , style:
-                  case file.series of
-                    Just series -> R.css { backgroundImage: mkIconURL series }
-                    Nothing -> R.css {}
-              }
-          , R.div
-              { className: "name"
-              , title: (un Path file.name)
-              , children: [ R.text $ un Path file.name ]
-              , onClick: Events.capture_ $ push (LinkClick idx file)
-              }
-          , R.div
-              { className: intercalate " "
-                [ "watched"
-                , maybe "" (const "has-date") file.watched
-                ]
-              , onClick: Events.capture_ $ push (WatchedClick idx file)
-              , children:
-                  [ R.text $ case file.watched of
-                      Just (DateString date) -> "watched " <> date
-                      Nothing -> maybe "" (\x -> " last: " <> show x) file.latest
-                  ]
-              }
-        ]
-    }
+      , onClick: do push (SetCursor idx)
+      }
+      [ R.div
+          { className: "icon"
+          , style:
+              case file.series of
+                Just series -> R.css { backgroundImage: mkIconURL series }
+                Nothing -> R.css {}
+          } []
+      , R.div
+          { className: "name"
+          , title: (un Path file.name)
+          , onClick: do push (LinkClick idx file)
+          }
+          [ R.text $ un Path file.name ]
+      , R.div
+          { className: intercalate " "
+            [ "watched"
+            , maybe "" (const "has-date") file.watched
+            ]
+          , onClick: do push (WatchedClick idx file)
+          }
+          [ R.text $ case file.watched of
+              Just (DateString date) -> "watched " <> date
+              Nothing -> maybe "" (\x -> " last: " <> show x) file.latest
+          ]
+    ]
 
 view :: Event AppState -> Effect (Event Action)
 view appStates = do
   { event, push } <- Event.create
 
   _ <- Event.subscribe appStates \appState -> do
-    renderJSX (ui { appState, push })
+    R.renderJSX (ui { appState, push })
 
   pure event
-
-foreign import renderJSX :: RB.JSX -> Effect Unit

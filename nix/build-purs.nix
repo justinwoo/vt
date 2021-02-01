@@ -3,20 +3,15 @@ let
   easy-ps = import ./easy-ps.nix { inherit pkgs; };
   package-set-archive = import ./package-set-archive.nix { inherit pkgs; };
   inputNames = [
-    "aff"
     "bonjiri"
     "calpis"
     "choco-pie"
-    "console"
-    "debug"
     "effect"
+    "js-date"
     "makkori"
     "naporitan"
-    "react-basic"
     "simple-json"
     "simple-json-utils"
-    "string-parsers"
-    "test-unit"
   ];
   packagesJson = "${package-set-archive}/packages.json";
   psc-package-nix = pkgs.fetchFromGitHub {
