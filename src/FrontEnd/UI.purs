@@ -32,11 +32,12 @@ ui = R.component "UI" \props -> do
     files = state.files
 
     header = R.div' "header"
-      [ R.div' "info" $ [ R.h3_ [ R.text "Info:" ] ] <> infoLines
-      , R.div' "recents" $ [ R.h3_ [ R.text "Recently watched:" ] ] <> recents
+      [ R.div' "info" $ [ R.h3_ "Info:" ] <> infoLines
+      , R.div' "recents" $ [ R.h3_ "Recently watched:" ] <> recents
       ]
 
-    infoLines = R.span_ <<< pure <<< R.text <$>
+    keySpan s = R.key s $ R.text s
+    infoLines = keySpan <$>
       [ "o: open current file"
       , "k: move cursor up"
       , "j: move cursor down"
@@ -51,17 +52,19 @@ ui = R.component "UI" \props -> do
 
     recents = mkRecent <$> Array.take (Array.length infoLines) state.watchedData
 
-    mkRecent { path: Path name } = R.div' "recent" [ R.text name ]
+    mkRecent { path: Path name } =
+      R.key name $
+        R.div' "recent"
+          [ R.text name ]
 
     mkFile :: Int -> File -> R.JSX
     mkFile idx file = fileElement { key: un Path file.name, idx, file, props }
 
   pure $
-    R.div_
-      [ R.h1_ [R.text "vidtracker"]
+    R.div_ $
+      [ R.h1_ "vidtracker"
       , header
-      , R.div_ $ Array.mapWithIndex mkFile files
-      ]
+      ] <> Array.mapWithIndex mkFile files
 
 type FileProps =
   { key :: String
@@ -90,6 +93,7 @@ fileElement = R.component "FileElement" \{ key, idx, file, props } -> do
       }
       [ R.div
           { className: "icon"
+          , key: "icon"
           , style:
               case file.series of
                 Just series -> R.css { backgroundImage: mkIconURL series }
@@ -97,6 +101,7 @@ fileElement = R.component "FileElement" \{ key, idx, file, props } -> do
           } []
       , R.div
           { className: "name"
+          , key: "name"
           , title: (un Path file.name)
           , onClick: do push (LinkClick idx file)
           }
@@ -106,6 +111,7 @@ fileElement = R.component "FileElement" \{ key, idx, file, props } -> do
             [ "watched"
             , maybe "" (const "has-date") file.watched
             ]
+          , key: "watched"
           , onClick: do push (WatchedClick idx file)
           }
           [ R.text $ case file.watched of

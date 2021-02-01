@@ -9,6 +9,9 @@ exports.component_ = (name) => (effectFn1) => {
   return effectFn1;
 };
 
+exports.key = (key) => (jsx) =>
+  React.createElement(React.Fragment, { key }, jsx);
+
 exports.element = (tag) => (props) => (children) =>
   React.createElement(tag, props, children);
 
