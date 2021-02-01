@@ -4,10 +4,9 @@ const ReactDOM = require("react-dom");
 exports.renderJSX = (jsx) => () =>
   ReactDOM.render(jsx, document.getElementById("app"));
 
-exports.component = (name) => (effect) => {
-  const myComponent = (props) => effect(props)();
-  myComponent.displayName = name;
-  return myComponent;
+exports.component_ = (name) => (effectFn1) => {
+  effectFn1.displayName = name;
+  return effectFn1;
 };
 
 exports.element = (tag) => (props) => (children) =>
@@ -15,18 +14,7 @@ exports.element = (tag) => (props) => (children) =>
 
 exports.useState_ = (tuple) => (initState) => () => {
   const [state, update] = React.useState(initState);
-  const updater = (fn) => {
-    update((s) => {
-      const newState = fn(s)();
-      return newState;
-    });
-  };
-  return tuple(state, updater);
+  return { state, update };
 };
 
-exports.useEffect = (keys) => (effect) => () => {
-  React.useEffect(() => {
-    const canceler = effect();
-    return canceler;
-  }, keys);
-};
+exports.useEffect = (keys) => (effect) => () => React.useEffect(effect, keys);
