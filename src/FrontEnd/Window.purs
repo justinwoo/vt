@@ -3,7 +3,6 @@ module FrontEnd.Window where
 import Prelude
 
 import Data.Foldable (traverse_)
-import Data.JSDate (getTime, now)
 import Data.Maybe (Maybe(..))
 import Data.Monoid (guard)
 import Effect (Effect)
@@ -17,12 +16,13 @@ foreign import addWindowKeyListener :: (String -> Effect Unit) -> Effect Unit
 foreign import refreshPage :: Effect Unit
 foreign import scrollIntoView :: Path -> Effect Unit
 foreign import scrollToTop :: Effect Unit
+foreign import getDateTime :: Effect Int
 
 window :: Event ScrollEvent -> Effect (Event KeyboardEvent)
 window scrollEvent = do
   {event, push} <- Event.create
 
-  prevTimeRef <- Ref.new 0.0
+  prevTimeRef <- Ref.new 0
 
   addWindowKeyListener \key -> do
     let
@@ -40,11 +40,11 @@ window scrollEvent = do
           _ -> Nothing
 
     prevTime <- Ref.read prevTimeRef
-    currTime <- getTime <$> now
+    currTime <- getDateTime
 
     let timediff = currTime - prevTime
 
-    guard (timediff > 40.0) do
+    guard (timediff > 40) do
       traverse_ push mAction
       Ref.modify_ (\_ -> currTime) prevTimeRef
 

@@ -1,17 +1,17 @@
-exports.addWindowKeyListener = function(effect) {
-  return function() {
-    window.addEventListener("keydown", function(e) {
+exports.addWindowKeyListener = function (effect) {
+  return function () {
+    window.addEventListener("keydown", function (e) {
       effect(e.key)();
     });
   };
 };
 
-exports.refreshPage = function() {
+exports.refreshPage = function () {
   window.location = window.location;
 };
 
-exports.scrollIntoView = function(selector) {
-  return function() {
+exports.scrollIntoView = function (selector) {
+  return function () {
     var e = document.querySelector('div[title="' + selector + '"]');
     if (e) {
       if (e.scrollIntoViewIfNeeded) {
@@ -23,6 +23,8 @@ exports.scrollIntoView = function(selector) {
   };
 };
 
-exports.scrollToTop = function() {
+exports.scrollToTop = function () {
   window.scroll(0, 0);
 };
+
+exports.getDateTime = () => new Date().getTime();

@@ -7,7 +7,6 @@ let
     "calpis"
     "choco-pie"
     "effect"
-    "js-date"
     "makkori"
     "naporitan"
     "simple-json"
