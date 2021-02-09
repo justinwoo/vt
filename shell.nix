@@ -72,7 +72,7 @@ pkgs.mkShell {
 
   shellHook = ''
     export PURS_IDE_SOURCES='${toString build-purs.unquotedSourceGlobs}'
-    export LD_LIBRARY_PATH='${ld-library-path}'
-    export LIBRARY_PATH='${library-path}'
+    # export LD_LIBRARY_PATH='${ld-library-path}'
+    # export LIBRARY_PATH='${library-path}'
   '';
 }
