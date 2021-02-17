@@ -5,6 +5,7 @@
 let
   easy-ps = import ./nix/easy-ps.nix { inherit pkgs; };
   build-purs = import ./nix/build-purs.nix { inherit pkgs; };
+  esbuild-drv = import ./nix/esbuild-drv.nix { inherit pkgs; };
 
   home = "/home/${user}";
   nix-init = ''. ${home}/.bashrc'';
@@ -68,6 +69,7 @@ pkgs.mkShell {
     copy-purs-output
     build-purs-script
     pkgs.sqlite
+    esbuild-drv
   ];
 
   shellHook = ''

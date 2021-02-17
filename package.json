@@ -2,13 +2,13 @@
   "scripts": {
     "build": "yarn run build:ps && yarn run build:fe",
     "build:ps": "build-purs",
-    "build:fe": "node_modules/.bin/parcel build index.html"
+    "build:fe": "yarn run build:fe:cp-index && yarn run build:fe:esbuild-bundle",
+    "build:fe:cp-index": "cp index.html dist/index.html",
+    "build:fe:esbuild-bundle": "esbuild --bundle index.js --outdir=dist --sourcemap --define:process.env.NODE_ENV='\"development\"'"
   },
   "dependencies": {
-    "parcel-bundler": "^1.12.4",
     "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "xstream": "^11.14.0"
+    "react-dom": "^17.0.1"
   },
   "license": "MIT"
 }
