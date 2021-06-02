@@ -70,13 +70,13 @@ pub async fn get_icons(dir: &String) -> MyResult<()> {
         if !target.exists() {
             println!("Downloading target: {:?}", &target);
 
-            let child = tokio::process::Command::new("get-icon")
+            let child = tokio::process::Command::new("get-icons")
                 .arg(&title)
                 .arg(target.to_string_lossy().to_string())
                 .spawn()
-                .expect("Error running get-icon");
+                .expect("Error running get-icons");
 
-            child.await.expect("Error waiting on get-icon");
+            child.await.expect("Error waiting on get-icons");
 
             println!("Downloaded target: {:?}", &target);
         }
